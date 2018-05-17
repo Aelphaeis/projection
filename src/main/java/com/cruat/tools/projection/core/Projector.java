@@ -11,9 +11,9 @@ package com.cruat.tools.projection.core;
 public interface Projector<T> {
 	/**
 	 * Represents a singular operation of projection
-	 * @return
+	 * @return true if project occurred, false if not
 	 */
-	boolean project();
+	boolean project() throws ProjectionException;
 	/**
 	 * Get the source of the projection.
 	 * @return
