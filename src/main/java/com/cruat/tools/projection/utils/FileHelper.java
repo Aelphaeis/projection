@@ -12,6 +12,12 @@ public class FileHelper {
 		return listFileTree(dir, true);
 	}
 
+	/**
+	 * Returns 
+	 * @param dir
+	 * @param recursive
+	 * @return
+	 */
 	public static Set<File> listFileTree(File dir, boolean recursive) {
 		Set<File> fileTree = new HashSet<>();
 		if (dir == null || !dir.exists()) {
