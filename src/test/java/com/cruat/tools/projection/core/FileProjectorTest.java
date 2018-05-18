@@ -11,7 +11,6 @@ import org.junit.Test;
 
 public class FileProjectorTest {
 
-//	private static final Logger logger = LogManager.getLogger();
 	private static final String SOURCE = "src/test/resources/source.txt";
 	private static final String TARGET = "src/test/resources/TestTarget";
 	FileProjector projector;
