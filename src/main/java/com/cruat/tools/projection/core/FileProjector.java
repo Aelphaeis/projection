@@ -20,7 +20,20 @@ public class FileProjector implements Projector<File> {
 		this.source = source;
 		this.target = target;
 		resolutionStrategy = res;
+		validateSource();
 	}
+
+	private void validateSource() {
+		if(!getSource().exists()) {
+			String err = "source must exist";
+			throw new IllegalArgumentException(err);
+		}
+		if(!getSource().isFile()) {
+			String err = "source must be a file";
+			throw new IllegalArgumentException(err);
+		}
+	}
+	
 
 	@Override
 	public boolean project() {
