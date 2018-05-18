@@ -6,8 +6,11 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Scanner;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.cruat.tools.projection.utils.FileHelper;
 
 public class FileProjectorTest {
 
@@ -32,5 +35,10 @@ public class FileProjectorTest {
 			String result = scanner.useDelimiter("\\Z").next();
 			assertEquals("This is a source file", result);
 		}
+	}
+	
+	@After
+	public void cleanup() {
+		FileHelper.deleteContents(new File(TARGET));
 	}
 }
