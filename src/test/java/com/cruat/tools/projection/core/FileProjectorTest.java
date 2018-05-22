@@ -1,44 +1,38 @@
 package com.cruat.tools.projection.core;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
-import com.cruat.tools.projection.utils.FileHelper;
+import org.junit.rules.TemporaryFolder;
 
 public class FileProjectorTest {
 
 	private static final String SOURCE = "src/test/resources/source.txt";
-	private static final String TARGET = "src/test/resources/TestTarget";
 	FileProjector projector;
 	
+	@Rule 
+	public TemporaryFolder targetFolder = new TemporaryFolder();
+	
 	@Before
-	public void setup() {
-		projector = new FileProjector(SOURCE, TARGET);
+	public void setup() throws IOException {
+		projector = new FileProjector(new File(SOURCE), targetFolder.newFile());
 	}
 	
 	@Test
 	public void project_validFile_projectsuccess() throws Exception {
+		//project
 		projector.project();
 		
-		String outputFile = TARGET + "/source.txt";
-		File tFile = new File(outputFile);
-		assertTrue(tFile.exists());
-		
-		try (Scanner scanner = new Scanner(tFile)){
+		//read target file to make sure it matches content
+		try (Scanner scanner = new Scanner(projector.getTarget())){
 			String result = scanner.useDelimiter("\\Z").next();
 			assertEquals("This is a source file", result);
 		}
-	}
-	
-	@After
-	public void cleanup() {
-		FileHelper.deleteContents(new File(TARGET));
 	}
 }

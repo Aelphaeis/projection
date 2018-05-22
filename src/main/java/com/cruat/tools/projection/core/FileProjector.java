@@ -20,6 +20,10 @@ public class FileProjector implements Projector<File> {
 	public FileProjector(String source, String target, ConflictResolution res) {
 		this(new File(source), new File(target), res);
 	}
+	
+	public FileProjector(File source, File target) {
+		this(source, target, ConflictResolution.OVERWRITE);
+	}
 
 	public FileProjector(File source, File target, ConflictResolution res) {
 		this.source = source;
@@ -43,8 +47,10 @@ public class FileProjector implements Projector<File> {
 	public boolean project() throws ProjectionException {
 		validateSource();
 		// check source exists
-
+		
 		File t = getTarget();
+		File s = getSource();
+		
 		// does targets directory exist ?
 		if (t.getParentFile() != null && !t.getParentFile().exists()) {
 			t.getParentFile().mkdirs();
@@ -58,7 +64,7 @@ public class FileProjector implements Projector<File> {
 
 		// makes sure it is not the same file
 		try {
-			if (source.getCanonicalPath().equals(t.getCanonicalPath())) {
+			if (s.getCanonicalPath().equals(t.getCanonicalPath())) {
 				String err = "Unable to write file " + source + " on itself.";
 				throw new ProjectionException(err);
 			}
@@ -67,12 +73,12 @@ public class FileProjector implements Projector<File> {
 		}
 
 		try {
-			copy(source, t);
+			copy(s, t);
 		} catch (IOException e) {
 			throw new ProjectionException(e);
 		}
 
-		if (source.length() != t.length()) {
+		if (s.length() != t.length()) {
 			String err = "Failed to copy full contents from  source to target";
 			throw new ProjectionException(err);
 		}
