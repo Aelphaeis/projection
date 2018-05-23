@@ -2,3 +2,12 @@ language: java
 install: true
 jdk:
   - oraclejdk8
+  - openjdk8
+ 
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: mvn deploy
+  on:
+    branch: 0.0.1
+    
