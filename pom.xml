@@ -41,4 +41,12 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<contributors>
+		<contributor>
+			<email>joseph.morain@live.ca</email>
+			<name>Joseph Morain</name>
+			<url>http://www.crusnikatelier.com</url>
+		</contributor>
+	</contributors>
 </project>
