@@ -1,6 +1,13 @@
 package com.cruat.tools.projection.core;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class DirectoryProjector implements Projector<File> {
 
@@ -47,6 +54,41 @@ public class DirectoryProjector implements Projector<File> {
 	public ConflictResolution getConflictResolutionStrategy() {
 		return resolutionStrategy;
 	}
+	
+	private static void moveDirectory(File source, File target) {
+        Path sourceParentFolder = source.toPath();
+        Path destinationParentFolder = target.toPath();
+
+        try {
+            Stream<Path> allFilesPathStream = Files.walk(sourceParentFolder);
+            Consumer<? super Path> action = new Consumer<Path>(){
+
+                @Override
+                public void accept(Path t) {
+                    try {
+                        String destinationPath = t.toString().replaceAll(sourceParentFolder.toString(), destinationParentFolder.toString());
+                        Files.copy(t, Paths.get(destinationPath));
+                    } 
+                    catch(FileAlreadyExistsException e){
+                        //TODO do acc to business needs
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            };
+            allFilesPathStream.forEach(action );
+
+        } catch(FileAlreadyExistsException e) {
+            //file already exists and unable to copy
+        } catch (IOException e) {
+            //permission issue
+            e.printStackTrace();
+        }
+
+    }
 
 	private void validateSource() {
 		if (!getSource().exists()) {
