@@ -18,7 +18,7 @@ public class DirectoryProjector implements Projector<File> {
 	private final File source;
 	private final File target;
 	private final FileMover move;
-	ConflictResolution resolutionStrategy;
+	private ConflictResolution resolutionStrategy;
 	
 
 	public DirectoryProjector(String source, String target) {
