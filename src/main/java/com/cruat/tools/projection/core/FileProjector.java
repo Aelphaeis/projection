@@ -9,7 +9,7 @@ import java.io.OutputStream;
 public class FileProjector implements Projector<File> {
 
 	private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
-	ConflictResolution resolutionStrategy;
+	ConflictResolution resolution;
 	private final File source;
 	private final File target;
 
@@ -29,7 +29,7 @@ public class FileProjector implements Projector<File> {
 	public FileProjector(File source, File target, ConflictResolution res) {
 		this.source = source;
 		this.target = target;
-		resolutionStrategy = res;
+		resolution = res;
 		validateSource();
 	}
 
@@ -41,6 +41,12 @@ public class FileProjector implements Projector<File> {
 		if (!getSource().isFile()) {
 			String err = "source must be a file";
 			throw new IllegalArgumentException(err);
+		}
+		
+		if(!getResolution().equals(ConflictResolution.OVERWRITE)) {
+			//TODO implement this 
+			String err = "Not Implemented Yet";
+			throw new UnsupportedOperationException(err);
 		}
 	}
 
@@ -112,11 +118,11 @@ public class FileProjector implements Projector<File> {
 	}
 
 	@Override
-	public ConflictResolution getConflictResolutionStrategy() {
-		return resolutionStrategy;
+	public ConflictResolution getResolution() {
+		return resolution;
 	}
 
-	public void setConflictResolutionStrategy(ConflictResolution s) {
-		this.resolutionStrategy = s;
+	public void setResolution(ConflictResolution s) {
+		this.resolution = s;
 	}
 }

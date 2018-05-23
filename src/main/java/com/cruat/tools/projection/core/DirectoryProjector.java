@@ -9,35 +9,41 @@ import java.nio.file.Paths;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class DirectoryProjector implements Projector<File> {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+public class DirectoryProjector implements Projector<File> {
+	private static final Logger logger = LogManager.getLogger();
+	
 	private final File source;
 	private final File target;
+	private final FileMover move;
 	ConflictResolution resolutionStrategy;
+	
 
 	public DirectoryProjector(String source, String target) {
 		this(source, target, ConflictResolution.OVERWRITE);
 	}
 
-	public DirectoryProjector(String source, String target, ConflictResolution res) {
-		this(new File(source), new File(target), res);
+	public DirectoryProjector(String s, String t, ConflictResolution r) {
+		this(new File(s), new File(t), r);
 	}
 	
-	public DirectoryProjector(File source, File target) {
-		this(source, target, ConflictResolution.OVERWRITE);
+	public DirectoryProjector(File s, File t) {
+		this(s, t, ConflictResolution.OVERWRITE);
 	}
 
-	public DirectoryProjector(File source, File target, ConflictResolution res) {
-		this.source = source;
-		this.target = target;
-		resolutionStrategy = res;
+	public DirectoryProjector(File s, File t, ConflictResolution r) {
+		this.source = s;
+		this.target = t;
+		resolutionStrategy = r;
 		validateSource();
+		move = new FileMover(getSource(), getTarget());
 	}
 	
 	@Override
 	public boolean project() throws ProjectionException {
-		// TODO Auto-generated method stub
-		return false;
+		return moveDirectory();
 	}
 
 	@Override
@@ -51,43 +57,30 @@ public class DirectoryProjector implements Projector<File> {
 	}
 
 	@Override
-	public ConflictResolution getConflictResolutionStrategy() {
+	public ConflictResolution getResolution() {
 		return resolutionStrategy;
 	}
 	
-	private static void moveDirectory(File source, File target) {
-        Path sourceParentFolder = source.toPath();
-        Path destinationParentFolder = target.toPath();
-
-        try {
-            Stream<Path> allFilesPathStream = Files.walk(sourceParentFolder);
-            Consumer<? super Path> action = new Consumer<Path>(){
-
-                @Override
-                public void accept(Path t) {
-                    try {
-                        String destinationPath = t.toString().replaceAll(sourceParentFolder.toString(), destinationParentFolder.toString());
-                        Files.copy(t, Paths.get(destinationPath));
-                    } 
-                    catch(FileAlreadyExistsException e){
-                        //TODO do acc to business needs
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
-            };
-            allFilesPathStream.forEach(action );
+	private boolean moveDirectory() {
+        Path sourceParentFolder = getSource().toPath();
+        try (Stream<Path> movables = Files.walk(sourceParentFolder)){
+            movables.forEach(move);
 
         } catch(FileAlreadyExistsException e) {
             //file already exists and unable to copy
+        	//TODO figure this out
         } catch (IOException e) {
-            //permission issue
-            e.printStackTrace();
+        	//probably permission issue
+        	//TODO figure out what we will do here
+        	String err = "Unexpected exception occurred";
+        	logger.error(err, e);
         }
-
+        try {
+            return move.isFilesMoved();
+        }
+        finally {
+        	move.reset();
+        }
     }
 
 	private void validateSource() {
@@ -98,6 +91,55 @@ public class DirectoryProjector implements Projector<File> {
 		if (!getSource().isDirectory()) {
 			String err = "source must be a file";
 			throw new IllegalArgumentException(err);
+		}
+	}
+	
+	private class FileMover implements Consumer<Path> {
+		
+		private final File target;
+		private final File source;
+		
+		private final String sourceBase;
+		private final String targetBase;
+		
+		private boolean isFilesMoved;
+		
+		public FileMover(File sDir, File tDir ) {
+			this.target = tDir;
+			this.source = sDir;
+			
+			sourceBase = this.source.toPath().toString();
+			targetBase = this.target.toPath().toString();
+			
+			isFilesMoved = false;
+		}
+
+		@Override
+		public void accept(Path source) {
+			String sPath = source.toString();
+			String targetLocation = sPath.replaceAll(sourceBase, targetBase);
+			
+			try {
+				Files.copy(source, Paths.get(targetLocation));
+				isFilesMoved = true;
+			}
+			catch(FileAlreadyExistsException e) {
+				//TODO figure out a way for caller to configure this
+			}
+			catch(IOException e) {
+				//I don't really expect this to happen.
+				//TODO figure out a way for caller to configure this
+				String err = "Unexpected exception occurred";
+	        	logger.error(err, e);
+			}
+		}
+		
+		public void reset() {
+			isFilesMoved = false;
+		}
+
+		public boolean isFilesMoved() {
+			return isFilesMoved;
 		}
 	}
 }

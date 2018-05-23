@@ -30,5 +30,5 @@ public interface Projector<T> {
 	 * a resource how should the projection handle it.
 	 * @return
 	 */
-	ConflictResolution getConflictResolutionStrategy();
+	ConflictResolution getResolution();
 }

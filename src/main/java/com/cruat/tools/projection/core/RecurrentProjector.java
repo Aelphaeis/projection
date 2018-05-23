@@ -43,8 +43,8 @@ public class RecurrentProjector<T> implements Projector<T> {
 	}
 
 	@Override
-	public ConflictResolution getConflictResolutionStrategy() {
-		return this.projector.getConflictResolutionStrategy();
+	public ConflictResolution getResolution() {
+		return this.projector.getResolution();
 	}
 
 	public void stop() {
