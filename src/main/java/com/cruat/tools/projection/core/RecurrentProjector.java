@@ -10,20 +10,24 @@ public class RecurrentProjector<T> implements Projector<T> {
 	private final TimerTask task;
 	private final Timer timer;
 	private final int period;
-	
-	public RecurrentProjector(Projector<T> projector)  {
-		this(projector, DEFAULT_INTERVAL);
+
+	public RecurrentProjector(Projector<T> projector) {
+		this(projector, new Timer(true));
 	}
-	
-	public RecurrentProjector(Projector<T> projector, int interval)  {
+
+	public RecurrentProjector(Projector<T> projector, Timer t) {
+		this(projector, t, DEFAULT_INTERVAL);
+	}
+
+	public RecurrentProjector(Projector<T> p, Timer t, int i) {
 		this.task = new ProjectionTask();
-		this.timer = new Timer(true);
-		this.projector = projector;
-		this.period = interval;
+		this.projector = p;
+		this.period = i;
+		this.timer = t;
 	}
-	
+
 	@Override
-	public boolean project(){
+	public boolean project() {
 		timer.schedule(task, 0, period);
 		return true;
 	}
@@ -42,18 +46,17 @@ public class RecurrentProjector<T> implements Projector<T> {
 	public ConflictResolution getConflictResolutionStrategy() {
 		return this.projector.getConflictResolutionStrategy();
 	}
-	
+
 	public void stop() {
 		timer.cancel();
 	}
-	
+
 	private class ProjectionTask extends TimerTask {
 		@Override
 		public void run() {
 			try {
 				RecurrentProjector.this.projector.project();
-			}
-			catch(ProjectionException e) {
+			} catch (ProjectionException e) {
 				throw new ProjectionRuntimeException(e);
 			}
 		}
