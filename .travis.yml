@@ -6,7 +6,7 @@ jdk:
  
 deploy:
   provider: script
-  script: mvn deploy
+  script: bash src/main/scripts/deployment.sh
   skip_cleanup: true
   on:
     branch: 0.0.1
