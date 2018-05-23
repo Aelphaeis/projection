@@ -5,9 +5,9 @@ jdk:
   - openjdk8
  
 deploy:
-  skip_cleanup: true
   provider: script
   script: mvn deploy
+  skip_cleanup: true
   on:
     branch: 0.0.1
     
