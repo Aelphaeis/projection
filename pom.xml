@@ -7,7 +7,6 @@
 	<artifactId>projection</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-
 	<name>com.cruat.tools.projection</name>
 	<url>http://maven.apache.org</url>
 
@@ -40,7 +39,29 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<extensions>
+			<extension>
+				<!-- see https://github.com/spring-projects/aws-maven -->
+				<!-- Necessary to push maven projects to s3 -->
+				<groupId>org.springframework.build</groupId>
+				<artifactId>aws-maven</artifactId>
+				<version>5.0.0.RELEASE</version>
+			</extension>
+		</extensions>
 	</build>
+	
+	<distributionManagement>
+		<repository>
+			<id>s3-maven-release-repo</id>
+			<name>aws release repository</name>
+			<url>s3://repo.maven/release</url>
+		</repository>
+		<snapshotRepository>
+			<id>s3-maven-snapshot-repo</id>
+			<name>aws snapshot repository</name>
+			<url>s3://repo.maven/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 	
 	<contributors>
 		<contributor>
