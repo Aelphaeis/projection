@@ -9,9 +9,10 @@ import java.io.OutputStream;
 public class FileProjector implements Projector<File> {
 
 	private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+	ConflictResolution resolutionStrategy;
 	private final File source;
 	private final File target;
-	ConflictResolution resolutionStrategy;
+
 
 	public FileProjector(String source, String target) {
 		this(source, target, ConflictResolution.OVERWRITE);
