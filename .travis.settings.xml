@@ -1,0 +1,14 @@
+<settings>
+	<servers>
+		<server>
+			<id>s3-maven-release-repo</id>
+			<username>${env.username}</username>
+			<password>${env.password}</password>
+		</server>
+		<server>
+			<id>s3-maven-snapshot-repo</id>
+			<username>${env.username}</username>
+			<password>${env.password}</password>
+		</server>
+	</servers>
+</settings>
