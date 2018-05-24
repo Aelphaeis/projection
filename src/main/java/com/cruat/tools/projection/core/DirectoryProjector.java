@@ -2,10 +2,12 @@ package com.cruat.tools.projection.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -14,18 +16,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class DirectoryProjector implements Projector<File> {
+	
 	private static final Logger logger = LogManager.getLogger();
 	
 	private final File source;
 	private final File target;
 	private final FileMover move;
 	
-
 	public DirectoryProjector(String s, String t) {
 		this(new File(s), new File(t));
 	}
 	
-
 	public DirectoryProjector(File s, File t) {
 		this.source = s;
 		this.target = t;
@@ -56,7 +57,6 @@ public class DirectoryProjector implements Projector<File> {
 
         } catch (IOException e) {
         	//probably permission issue
-        	//TODO figure out what we will do here
         	String err = "Unexpected exception occurred";
         	logger.error(err, e);
         }
@@ -101,22 +101,23 @@ public class DirectoryProjector implements Projector<File> {
 
 		@Override
 		public void accept(Path source) {
+			accept(source, new CopyOption[0]);
+		}
+		
+		public void accept(Path source, CopyOption... opts) {
 			String sPath = source.toString();
 			String targetLocation = sPath.replaceAll(Pattern.quote(sourceBase), targetBase);
 			Path tPath = Paths.get(targetLocation);
 			
 			try {
-				Files.copy(source, tPath);
+				Files.copy(source, tPath, opts);
 				isFilesMoved = true;
 			}
 			catch(FileAlreadyExistsException e) {
-				//TODO figure out a way for caller to configure this
+				accept(source, StandardCopyOption.REPLACE_EXISTING);
 			}
 			catch(IOException e) {
-				//I don't really expect this to happen.
-				//TODO figure out a way for caller to configure this
-				String err = "Unexpected exception occurred";
-	        	logger.error(err, e);
+	        	logger.error("Unexpected exception", e);
 			}
 		}
 		
