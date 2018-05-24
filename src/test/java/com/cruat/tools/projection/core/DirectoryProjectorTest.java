@@ -13,8 +13,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.cruat.tools.projection.utils.FileHelper;
-
 public class DirectoryProjectorTest {
 
 	private static final String SOURCE_LOCATION ="src/test/resources/sourcedir";
@@ -35,10 +33,7 @@ public class DirectoryProjectorTest {
 		assertTrue(projector.project());
 		File root = targetFolder.getRoot();
 		Path rootPath = root.toPath();
-		
-		for(File f : FileHelper.listFileTree(root)){
-			System.out.println(f.getAbsolutePath());
-		}
+
 		result = new String(Files.readAllBytes(rootPath.resolve("one.txt")));
 		assertEquals("one", result);
 		
