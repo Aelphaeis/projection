@@ -3,6 +3,9 @@ package com.cruat.tools.projection.core;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.cruat.tools.projection.core.exceptions.ProjectionException;
+import com.cruat.tools.projection.core.exceptions.ProjectionRuntimeException;
+
 public class RecurrentProjector<T> implements Projector<T> {
 	public static final int DEFAULT_INTERVAL = 5000;
 

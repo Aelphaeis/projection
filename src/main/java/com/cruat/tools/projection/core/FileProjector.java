@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.cruat.tools.projection.core.exceptions.ProjectionException;
+
 public class FileProjector implements Projector<File> {
 
 	private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
