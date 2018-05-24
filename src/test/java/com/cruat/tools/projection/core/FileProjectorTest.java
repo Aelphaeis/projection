@@ -26,7 +26,6 @@ public class FileProjectorTest {
 	
 	@Test
 	public void project_validFile_projectsuccess() throws Exception {
-		//project
 		projector.project();
 		
 		//read target file to make sure it matches content
@@ -38,7 +37,11 @@ public class FileProjectorTest {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void project_missingSource_exception() throws Exception {
-		//project
 		projector = new FileProjector("missing", "missing");
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void project_directorySource_exception() throws Exception {
+		projector = new FileProjector("src", "missing");
 	}
 }
