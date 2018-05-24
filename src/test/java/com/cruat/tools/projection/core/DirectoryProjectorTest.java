@@ -18,20 +18,22 @@ public class DirectoryProjectorTest {
 	private static final String SOURCE_LOCATION ="src/test/resources/sourcedir";
 	DirectoryProjector projector;
 	@Rule 
-	public TemporaryFolder targetFolder = new TemporaryFolder();
+	public TemporaryFolder target = new TemporaryFolder();
 	
 	
 	@Before
 	public void setup() {
 		File source = new File(SOURCE_LOCATION);
-		projector = new DirectoryProjector(source, targetFolder.getRoot());
+		String sourcePath = source.getAbsolutePath();
+		String targetPath = target.getRoot().getAbsolutePath();
+		projector = new DirectoryProjector(sourcePath, targetPath);
 	}
 	
 	@Test
 	public void project_validLocation_projectionSuccessful() throws IOException  {
 		String result;
 		assertTrue(projector.project());
-		File root = targetFolder.getRoot();
+		File root = target.getRoot();
 		Path rootPath = root.toPath();
 
 		result = new String(Files.readAllBytes(rootPath.resolve("one.txt")));
@@ -42,5 +44,15 @@ public class DirectoryProjectorTest {
 
 		result = new String(Files.readAllBytes(rootPath.resolve("nested/three.txt")));
 		assertEquals("three", result);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void project_invalidSource_exception() {
+		projector = new DirectoryProjector("missing", "missing");
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void project_FileSource_exception() {
+		projector = new DirectoryProjector(SOURCE_LOCATION + "/one.txt", "missing");
 	}
 }
