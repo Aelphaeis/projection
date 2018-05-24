@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -42,7 +43,7 @@ public class DirectoryProjector implements Projector<File> {
 	}
 	
 	@Override
-	public boolean project() throws ProjectionException {
+	public boolean project() {
 		return moveDirectory();
 	}
 
@@ -109,7 +110,7 @@ public class DirectoryProjector implements Projector<File> {
 			this.source = sDir;
 			
 			sourceBase = this.source.toPath().toString();
-			targetBase = this.target.toPath().toString();
+			targetBase = this.target.toPath().toString().replaceAll(Pattern.quote("\\"), "/");
 			
 			isFilesMoved = false;
 		}
@@ -117,7 +118,7 @@ public class DirectoryProjector implements Projector<File> {
 		@Override
 		public void accept(Path source) {
 			String sPath = source.toString();
-			String targetLocation = sPath.replaceAll(sourceBase, targetBase);
+			String targetLocation = sPath.replaceAll(Pattern.quote(sourceBase), targetBase);
 			
 			try {
 				Files.copy(source, Paths.get(targetLocation));
