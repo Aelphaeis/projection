@@ -9,27 +9,16 @@ import java.io.OutputStream;
 public class FileProjector implements Projector<File> {
 
 	private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
-	ConflictResolution resolution;
 	private final File source;
 	private final File target;
 
-
 	public FileProjector(String source, String target) {
-		this(source, target, ConflictResolution.OVERWRITE);
+		this(new File(source), new File(target));
 	}
 
-	public FileProjector(String source, String target, ConflictResolution res) {
-		this(new File(source), new File(target), res);
-	}
-	
 	public FileProjector(File source, File target) {
-		this(source, target, ConflictResolution.OVERWRITE);
-	}
-
-	public FileProjector(File source, File target, ConflictResolution res) {
 		this.source = source;
 		this.target = target;
-		resolution = res;
 		validateSource();
 	}
 
@@ -42,22 +31,16 @@ public class FileProjector implements Projector<File> {
 			String err = "source must be a file";
 			throw new IllegalArgumentException(err);
 		}
-		
-		if(!getResolution().equals(ConflictResolution.OVERWRITE)) {
-			//TODO implement this 
-			String err = "Not Implemented Yet";
-			throw new UnsupportedOperationException(err);
-		}
 	}
 
 	@Override
 	public boolean project() throws ProjectionException {
 		validateSource();
 		// check source exists
-		
+
 		File t = getTarget();
 		File s = getSource();
-		
+
 		// does targets directory exist ?
 		if (t.getParentFile() != null && !t.getParentFile().exists()) {
 			t.getParentFile().mkdirs();
@@ -115,14 +98,5 @@ public class FileProjector implements Projector<File> {
 	@Override
 	public File getTarget() {
 		return target;
-	}
-
-	@Override
-	public ConflictResolution getResolution() {
-		return resolution;
-	}
-
-	public void setResolution(ConflictResolution s) {
-		this.resolution = s;
 	}
 }

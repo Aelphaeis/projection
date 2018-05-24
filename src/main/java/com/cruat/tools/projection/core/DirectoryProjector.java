@@ -19,26 +19,18 @@ public class DirectoryProjector implements Projector<File> {
 	private final File source;
 	private final File target;
 	private final FileMover move;
-	private ConflictResolution resolutionStrategy;
 	
 
-	public DirectoryProjector(String source, String target) {
-		this(source, target, ConflictResolution.OVERWRITE);
-	}
-
-	public DirectoryProjector(String s, String t, ConflictResolution r) {
-		this(new File(s), new File(t), r);
+	public DirectoryProjector(String s, String t) {
+		this(new File(s), new File(t));
 	}
 	
+
 	public DirectoryProjector(File s, File t) {
-		this(s, t, ConflictResolution.OVERWRITE);
-	}
-
-	public DirectoryProjector(File s, File t, ConflictResolution r) {
 		this.source = s;
 		this.target = t;
-		resolutionStrategy = r;
 		validateSource();
+		
 		move = new FileMover(getSource(), getTarget());
 	}
 	
@@ -57,11 +49,6 @@ public class DirectoryProjector implements Projector<File> {
 		return target;
 	}
 
-	@Override
-	public ConflictResolution getResolution() {
-		return resolutionStrategy;
-	}
-	
 	private boolean moveDirectory() {
         Path sourceParentFolder = getSource().toPath();
         try (Stream<Path> movables = Files.walk(sourceParentFolder)){
@@ -116,9 +103,10 @@ public class DirectoryProjector implements Projector<File> {
 		public void accept(Path source) {
 			String sPath = source.toString();
 			String targetLocation = sPath.replaceAll(Pattern.quote(sourceBase), targetBase);
+			Path tPath = Paths.get(targetLocation);
 			
 			try {
-				Files.copy(source, Paths.get(targetLocation));
+				Files.copy(source, tPath);
 				isFilesMoved = true;
 			}
 			catch(FileAlreadyExistsException e) {

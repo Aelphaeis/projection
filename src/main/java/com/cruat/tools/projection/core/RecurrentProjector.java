@@ -42,11 +42,6 @@ public class RecurrentProjector<T> implements Projector<T> {
 		return this.projector.getTarget();
 	}
 
-	@Override
-	public ConflictResolution getResolution() {
-		return this.projector.getResolution();
-	}
-
 	public void stop() {
 		timer.cancel();
 	}

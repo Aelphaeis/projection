@@ -24,11 +24,4 @@ public interface Projector<T> {
 	 * @return
 	 */
 	T getTarget();
-	
-	/**
-	 * During projection if there is a conflict where their already exists
-	 * a resource how should the projection handle it.
-	 * @return
-	 */
-	ConflictResolution getResolution();
 }
