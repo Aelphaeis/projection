@@ -3,10 +3,14 @@ package com.cruat.tools.projection.core;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.cruat.tools.projection.core.exceptions.ProjectionException;
 import com.cruat.tools.projection.core.exceptions.ProjectionRuntimeException;
 
 public class RecurrentProjector<T> implements Projector<T> {
+	private static final Logger logger = LogManager.getLogger();
 	public static final int DEFAULT_INTERVAL = 5000;
 
 	private final Projector<T> projector;
@@ -55,6 +59,7 @@ public class RecurrentProjector<T> implements Projector<T> {
 			try {
 				RecurrentProjector.this.projector.project();
 			} catch (ProjectionException e) {
+				logger.error("Unknown error", e);
 				throw new ProjectionRuntimeException(e);
 			}
 		}
