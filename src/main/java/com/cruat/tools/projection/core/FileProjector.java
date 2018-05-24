@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import com.cruat.tools.projection.core.exceptions.ProjectionException;
+import com.cruat.tools.projection.core.exceptions.ProjectionRuntimeException;
 
 public class FileProjector implements Projector<File> {
 
@@ -33,13 +34,25 @@ public class FileProjector implements Projector<File> {
 			String err = "source must be a file";
 			throw new IllegalArgumentException(err);
 		}
+		
+		//make sure not same file
+		try {
+			String sPath = getSource().getCanonicalPath();
+			String tPath = getTarget().getCanonicalPath();
+			
+			if (sPath.equals(tPath)) {
+				String err = "Unable to write file " + source + " on itself.";
+				throw new IllegalArgumentException(err);
+			}
+		} catch (IOException e) {
+			//shouldn't really happened.
+			throw new ProjectionRuntimeException(e);
+		}
+
 	}
 
 	@Override
 	public boolean project() throws ProjectionException {
-		validateSource();
-		// check source exists
-
 		File t = getTarget();
 		File s = getSource();
 
@@ -54,16 +67,6 @@ public class FileProjector implements Projector<File> {
 			throw new ProjectionException(err);
 		}
 
-		// makes sure it is not the same file
-		try {
-			if (s.getCanonicalPath().equals(t.getCanonicalPath())) {
-				String err = "Unable to write file " + source + " on itself.";
-				throw new ProjectionException(err);
-			}
-		} catch (IOException e) {
-			throw new ProjectionException(e);
-		}
-
 		try {
 			copy(s, t);
 		} catch (IOException e) {
@@ -74,7 +77,7 @@ public class FileProjector implements Projector<File> {
 			String err = "Failed to copy full contents from  source to target";
 			throw new ProjectionException(err);
 		}
-		return false;
+		return true;
 	}
 
 	static void copy(File s, File t) throws IOException {
