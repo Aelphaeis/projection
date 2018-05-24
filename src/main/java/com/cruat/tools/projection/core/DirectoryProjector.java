@@ -67,9 +67,6 @@ public class DirectoryProjector implements Projector<File> {
         try (Stream<Path> movables = Files.walk(sourceParentFolder)){
             movables.forEach(move);
 
-        } catch(FileAlreadyExistsException e) {
-            //file already exists and unable to copy
-        	//TODO figure this out
         } catch (IOException e) {
         	//probably permission issue
         	//TODO figure out what we will do here
