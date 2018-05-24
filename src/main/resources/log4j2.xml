@@ -5,10 +5,6 @@
 		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout pattern="[%-5p] %d{yyyy-MM-dd HH:mm:ss.SSS} %l: %m%n" />
 		</Console>
-		<File name="errorFile" fileName="logs/error.log">
-			<PatternLayout pattern="[%-5p] %d{yyyy-MM-dd HH:mm:ss.SSS} %l: %m%n" />
-			<ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY" />
-		</File>
 	</Appenders>
 	<Loggers>
 		<Root level="trace">
