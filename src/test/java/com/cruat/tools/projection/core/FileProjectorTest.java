@@ -2,7 +2,6 @@ package com.cruat.tools.projection.core;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -21,7 +20,8 @@ public class FileProjectorTest {
 	
 	@Before
 	public void setup() throws IOException {
-		projector = new FileProjector(new File(SOURCE), targetFolder.newFile());
+		String target = targetFolder.newFile().getAbsolutePath();
+		projector = new FileProjector(SOURCE, target);
 	}
 	
 	@Test
@@ -34,5 +34,11 @@ public class FileProjectorTest {
 			String result = scanner.useDelimiter("\\Z").next();
 			assertEquals("This is a source file", result);
 		}
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void project_missingSource_exception() throws Exception {
+		//project
+		projector = new FileProjector("missing", "missing");
 	}
 }
