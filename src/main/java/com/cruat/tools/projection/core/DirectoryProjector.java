@@ -130,7 +130,6 @@ public class DirectoryProjector implements Projector<File> {
 				if(overwrite) {
 					logger.info("[{}] already exists. Replacing.", tPath);
 					accept(source, StandardCopyOption.REPLACE_EXISTING);
-					
 				}
 				else {
 					logger.info("[{}] already exists. Skipping", tPath);
