@@ -22,16 +22,26 @@ public class DirectoryProjector implements Projector<File> {
 	private final File source;
 	private final File target;
 	private final FileMover move;
+	private final boolean overwrite;
 	
 	public DirectoryProjector(String s, String t) {
 		this(new File(s), new File(t));
 	}
 	
+	public DirectoryProjector(String s, String t, boolean overwrite) {
+		this(new File(s), new File(t), overwrite);
+	}
+	
 	public DirectoryProjector(File s, File t) {
+		this(s, t, true);
+	}
+	
+	public DirectoryProjector(File s, File t, boolean overwrite) {
 		this.source = s;
 		this.target = t;
 		validateSource();
 		
+		this.overwrite = overwrite;
 		move = new FileMover(getSource(), getTarget());
 	}
 	
@@ -54,7 +64,6 @@ public class DirectoryProjector implements Projector<File> {
         Path sourceParentFolder = getSource().toPath();
         try (Stream<Path> movables = Files.walk(sourceParentFolder)){
             movables.forEach(move);
-
         } catch (IOException e) {
         	//probably permission issue
         	String err = "Unexpected exception occurred";
@@ -111,12 +120,21 @@ public class DirectoryProjector implements Projector<File> {
 			String targetLocation = sPath.replaceAll(quoted, targetBase);
 			Path tPath = Paths.get(targetLocation);
 			
+			logger.info("Moving [{}] to [{}]", sPath, tPath);
+			
 			try {
 				Files.copy(source, tPath, opts);
 				isFilesMoved = true;
 			}
 			catch(FileAlreadyExistsException e) {
-				accept(source, StandardCopyOption.REPLACE_EXISTING);
+				if(overwrite) {
+					logger.info("[{}] already exists. Replacing.", tPath);
+					accept(source, StandardCopyOption.REPLACE_EXISTING);
+					
+				}
+				else {
+					logger.info("[{}] already exists. Skipping", tPath);
+				}
 			}
 			catch(IOException e) {
 	        	logger.error("Unexpected exception", e);
