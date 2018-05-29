@@ -127,7 +127,9 @@ public class DirectoryProjector implements Projector<File> {
 				isFilesMoved = true;
 			}
 			catch(FileAlreadyExistsException e) {
-				if(overwrite) {
+				//NB : e can be null, but really it should ever happen.
+				File existing = new File(e.getFile());
+				if(!existing.isDirectory() && overwrite) {
 					logger.info("[{}] already exists. Replacing.", tPath);
 					accept(source, StandardCopyOption.REPLACE_EXISTING);
 				}
