@@ -1,7 +1,9 @@
 package com.cruat.tools.projection.core;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,30 +15,32 @@ public class RecurrentProjector<T> implements Projector<T> {
 	private static final Logger logger = LogManager.getLogger();
 	public static final int DEFAULT_INTERVAL = 5000;
 
+	private final ScheduledExecutorService timer;
 	private final Projector<T> projector;
-	private final TimerTask task;
-	private final Timer timer;
-	private final int period;
+	private ScheduledFuture<?> future;
+	private final int p;
 	boolean ownTimer = false;
-	public RecurrentProjector(Projector<T> projector) {
-		this(projector, new Timer(true));
+	
+	public RecurrentProjector(Projector<T> p) {
+		this(p, Executors.newScheduledThreadPool(1));
 		ownTimer = true;
 	}
 
-	public RecurrentProjector(Projector<T> projector, Timer t) {
-		this(projector, t, DEFAULT_INTERVAL);
+	public RecurrentProjector(Projector<T> p, ScheduledExecutorService t) {
+		this(p, t, DEFAULT_INTERVAL);
 	}
 
-	public RecurrentProjector(Projector<T> p, Timer t, int i) {
-		this.task = new ProjectionTask();
+	public RecurrentProjector(Projector<T> p, ScheduledExecutorService t, 
+			int i) {
 		this.projector = p;
-		this.period = i;
 		this.timer = t;
+		this.p = i;
 	}
 
 	@Override
 	public boolean project() {
-		timer.schedule(task, 0, period);
+		Runnable r = new ProjectionRunnable();
+		future = timer.scheduleWithFixedDelay(r, 0, p, TimeUnit.MILLISECONDS);
 		return true;
 	}
 
@@ -51,9 +55,11 @@ public class RecurrentProjector<T> implements Projector<T> {
 	}
 
 	public void stop() {
-		task.cancel();
+		if(future!= null) {
+			future.cancel(false);
+		}
 		if(ownTimer) {
-			timer.cancel();
+			timer.shutdown();
 		}
 	}
 	
@@ -61,8 +67,7 @@ public class RecurrentProjector<T> implements Projector<T> {
 		return projector;
 	}
 
-	private class ProjectionTask extends TimerTask {
-		@Override
+	private class ProjectionRunnable implements Runnable {
 		public void run() {
 			try {
 				RecurrentProjector.this.projector.project();
