@@ -123,6 +123,8 @@ public class DirectoryProjector implements Projector<File> {
 			logger.info("Moving [{}] to [{}]", sPath, tPath);
 			
 			try {
+				//make parent directories.
+				tPath.toFile().getParentFile().mkdirs();
 				Files.copy(source, tPath, opts);
 				isFilesMoved = true;
 			}
