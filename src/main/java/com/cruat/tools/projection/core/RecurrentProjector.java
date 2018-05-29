@@ -70,7 +70,9 @@ public class RecurrentProjector<T> implements Projector<T> {
 	private class ProjectionRunnable implements Runnable {
 		public void run() {
 			try {
-				RecurrentProjector.this.projector.project();
+				Projector<T> pjtr = RecurrentProjector.this.projector;
+				logger.info("Running projector {}", pjtr);
+				pjtr.project();
 			} catch (ProjectionException e) {
 				logger.error("Unknown error", e);
 				throw new ProjectionRuntimeException(e);
