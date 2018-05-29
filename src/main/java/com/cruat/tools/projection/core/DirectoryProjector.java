@@ -94,7 +94,8 @@ public class DirectoryProjector implements Projector<File> {
 			this.source = sDir;
 			
 			sourceBase = this.source.toPath().toString();
-			targetBase = this.target.toPath().toString().replaceAll(Pattern.quote("\\"), "/");
+			String tBase = this.target.toPath().toString();
+			targetBase = tBase.replaceAll(Pattern.quote("\\"), "/");
 			
 			isFilesMoved = false;
 		}
@@ -106,7 +107,8 @@ public class DirectoryProjector implements Projector<File> {
 		
 		public void accept(Path source, CopyOption... opts) {
 			String sPath = source.toString();
-			String targetLocation = sPath.replaceAll(Pattern.quote(sourceBase), targetBase);
+			String quoted = Pattern.quote(sourceBase);
+			String targetLocation = sPath.replaceAll(quoted, targetBase);
 			Path tPath = Paths.get(targetLocation);
 			
 			try {
