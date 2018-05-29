@@ -17,9 +17,10 @@ public class RecurrentProjector<T> implements Projector<T> {
 	private final TimerTask task;
 	private final Timer timer;
 	private final int period;
-
+	boolean ownTimer = false;
 	public RecurrentProjector(Projector<T> projector) {
 		this(projector, new Timer(true));
+		ownTimer = true;
 	}
 
 	public RecurrentProjector(Projector<T> projector, Timer t) {
@@ -50,7 +51,10 @@ public class RecurrentProjector<T> implements Projector<T> {
 	}
 
 	public void stop() {
-		timer.cancel();
+		task.cancel();
+		if(ownTimer) {
+			timer.cancel();
+		}
 	}
 
 	private class ProjectionTask extends TimerTask {
