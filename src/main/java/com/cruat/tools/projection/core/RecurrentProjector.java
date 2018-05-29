@@ -56,6 +56,10 @@ public class RecurrentProjector<T> implements Projector<T> {
 			timer.cancel();
 		}
 	}
+	
+	public Projector<T> getInternalProjector() {
+		return projector;
+	}
 
 	private class ProjectionTask extends TimerTask {
 		@Override
